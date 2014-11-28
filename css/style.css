@@ -1,0 +1,199 @@
+.ia-main {
+	position: relative;
+	padding: 0;
+	margin-top: 10px;
+}
+
+.ia-main p, .ia-main img, p.comment-image, p.comment-image img {
+	margin: 0;
+	padding: 0;
+	line-height: 0;
+}
+
+.anotBox {
+	width: 30px;
+	height: 30px;
+	border: 1px solid #fff;
+	z-index: 999;
+	border-radius: 3px;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	background: rgba(245,245,245,0.2);
+	box-shadow: 0 0 6px rgba(0,0,0,0.8);
+	-webkit-transition: none;
+	-moz-transition: none;
+	-ms-transition: none;
+	-o-transition: none;
+	transition: none;
+}
+
+.anotText {
+	z-index: 999;
+	box-shadow: 0 0 3px #aaa;
+	background: #f4f4f4;
+	height: auto;
+	width: 100%;
+	box-sizing: border-box;
+	display: none;
+	padding: 10px;
+	margin: 10px 0 10px 0;
+	line-height: 0;
+}
+
+.anotText textarea {
+	padding-left: 3px;
+	margin-bottom: 10px;
+	width: 98%;
+}
+
+.ia-main:hover .ia-area-vis-switch,
+.ia-main:hover .ia-annotations-vis-switch { 
+	visibility: visible;
+	opacity: 1;
+	transition-delay: 0s;
+}
+
+.ia-area-vis-switch, .ia-annotations-vis-switch {
+	background: rgba(255,255,255,0.9);
+	background-repeat: no-repeat;
+	position: absolute;
+	right: 5px;
+	width: 16px;
+	height: 16px;
+	padding: 5px;
+	border-radius: 13px;
+	cursor: pointer;
+	visibility: hidden;
+	opacity: 0;
+	transition: visibility 0s ease-out 0.15s, opacity 0.15s ease-out;
+	z-index: 1111;
+}
+
+.ia-area-vis-switch { background-image: url('../img/icon-eye.png'); top: 5px; }
+.ia-annotations-vis-switch { background-image: url('../img/icon-list.png'); bottom: 5px; }
+
+.hide, .show:hover { background-position: -1px 0px; }
+.hide:hover, .show { background-position: -27px 0px; }
+
+.ia-annotations ul {
+	list-style: none;
+	margin: 0 0 20px 0;
+}
+
+.ia-annotations ul li:nth-child(odd) {
+	background: rgba(255,255,255,0.15);
+}
+
+.ia-annotations ul li {
+	padding: 0px 8px 8px 8px;
+	border-bottom: 1px solid rgba(0,0,0,0.1);
+	margin: 0;
+	position: relative;
+}
+
+.ia-annotations ul li span.ia-date {
+	font-size: 0.75em;
+	font-weight: 500;
+	color: #444;
+}
+
+.ia-annotations ul li span.ia-author {
+	font-size: 0.75em;
+	margin-left: 7px;
+	font-weight: 700;
+}
+
+.ia-annotations ul li span.ia-text {
+	display: block;
+	font-size: 0.9em;
+	line-height: 1em;
+}
+
+.ia-area {
+	position: absolute;
+	z-index: 998;
+	border: 1px solid #000;
+	box-shadow: 0 0 1px 1px #fff;
+	background: rgba(0,0,0,0.03);
+	border-radius: 3px;
+}
+
+.ia-annotation {
+	transition: background 0.15s ease-out;
+}
+
+.ia-area.hovered {
+	background: rgba(0,0,0,0.2);
+	background: -moz-radial-gradient(center, ellipse cover, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.2) 100%);
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(255,255,255,0.2)), color-stop(100%,rgba(0,0,0,0.2)));
+	background: -webkit-radial-gradient(center, ellipse cover, rgba(255,255,255,0.2) 0%,rgba(0,0,0,0.2) 100%);
+	background: -o-radial-gradient(center, ellipse cover, rgba(255,255,255,0.2) 0%,rgba(0,0,0,0.2) 100%);
+	background: -ms-radial-gradient(center, ellipse cover, rgba(255,255,255,0.2) 0%,rgba(0,0,0,0.2) 100%);
+	background: radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%,rgba(0,0,0,0.2) 100%);
+}
+
+.ia-annotations ul li.ia-annotation.hovered {
+	background: rgba(240,240,240,0.8);
+}
+
+.ia-annotation:hover .ia-del {
+	visibility: visible;
+	opacity: 1;
+	transition-delay: 0s;
+}
+
+.ia-del {
+	background: rgba(255,255,255,0.6);
+	background-repeat: no-repeat;
+	background-image: url('../img/icon-delete.png');
+	background-position: -1px 0px;
+	position: absolute;
+	top: 6px;
+	right: 4px;
+	width: 16px;
+	height: 16px;
+	padding: 5px;
+	border-radius: 13px;
+	cursor: pointer;
+	visibility: hidden;
+	opacity: 0;
+	transition: visibility 0s ease-out 0.15s, opacity 0.15s ease-out;
+	z-index: 1111;
+}
+
+.ia-del:hover {
+	background-position: -27px 0px;
+}
+
+button {
+	padding: 6px 10px;
+	margin: 0 7px 0 0;
+	border-radius: 5px;
+	text-transform: uppercase;
+	transition: all 0.3s ease-in-out;
+}
+
+button.ia-ok {
+	background: #555;
+	font-weight: bold;
+	color: #fff;
+	border: 1px solid #aaa;
+	float: left;
+}
+
+button.ia-cancel {
+	background: transparent;
+	border: 1px solid #ccc;
+	color: #666;
+}
+
+button.ia-cancel:hover {
+	background: #eee;
+	border-color: #ccc;
+}
+
+button.ia-ok:hover {
+	background: #888;
+	border-color: #ccc;
+}
