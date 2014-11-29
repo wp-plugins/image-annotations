@@ -4,7 +4,7 @@ Donate link: http://m03g.guriny.ru/image-annotations/
 Tags: images, note, annotations, comments
 Requires at least: 3.8.1
 Tested up to: 4.0.1
-Stable tag: 1.00
+Stable tag: 1.01
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,5 +31,18 @@ Important: for now the plugin works only with [Comment Images](https://wordpress
 
 == Changelog ==
 
-= 1.0 =
+= 1.01 =
+
+* Bug fix. Past comments will have to delete :( 
+* Added Russian and English
+* Added color for the frames and comments
+* Added smooth animation
+
+* Устранена ошибка, из-за которой комментарии с кавычками не сохранялись (к сожалению, прошлые комментарии придётся удалить, так как они будут выводиться некорректно)
+* Добавлена поддержка английского и русского языков
+* Добавлены цвета рамок выделений и комментариев - у каждого пользователя свой цвет, основанный на его нике
+* Добавлена плавная анимация для некоторых действий
+
+= 1.00 =
+
 * First version
