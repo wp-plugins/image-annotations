@@ -66,8 +66,11 @@
 	cursor: pointer;
 	visibility: hidden;
 	opacity: 0;
+	-webkit-box-sizing: content-box;
+  	-moz-box-sizing: content-box;
+	box-sizing: content-box;
 	transition: visibility 0s ease-out 0.15s, opacity 0.15s ease-out;
-	z-index: 1111;
+	z-index: 399;
 }
 
 .ia-area-vis-switch { background-image: url('../img/icon-eye.png'); top: 5px; }
@@ -107,12 +110,12 @@
 .ia-annotations ul li span.ia-text {
 	display: block;
 	font-size: 0.9em;
-	line-height: 1em;
+	line-height: 1.6em;
 }
 
 .ia-area {
 	position: absolute;
-	z-index: 998;
+	z-index: 299;
 	border: 1px solid #000;
 	box-shadow: 0 0 1px 1px #fff;
 	background: rgba(0,0,0,0.03);
@@ -137,20 +140,18 @@
 	background: rgba(240,240,240,0.8);
 }
 
-.ia-annotation:hover .ia-del {
+.ia-annotation:hover .ia-del, .ia-annotation:hover .ia-edit {
 	visibility: visible;
 	opacity: 1;
 	transition-delay: 0s;
 }
 
-.ia-del {
+.ia-edit, .ia-del {
 	background: rgba(255,255,255,0.6);
-	background-repeat: no-repeat;
-	background-image: url('../img/icon-delete.png');
+	background-repeat: no-repeat;	
 	background-position: -1px 0px;
 	position: absolute;
 	top: 6px;
-	right: 4px;
 	width: 16px;
 	height: 16px;
 	padding: 5px;
@@ -158,11 +159,25 @@
 	cursor: pointer;
 	visibility: hidden;
 	opacity: 0;
+	-webkit-box-sizing: content-box;
+  	-moz-box-sizing: content-box;
+	box-sizing: content-box;
 	transition: visibility 0s ease-out 0.15s, opacity 0.15s ease-out;
 	z-index: 1111;
 }
 
-.ia-del:hover {
+.ia-edit {
+	background-image: url('../img/icon-edit.png');
+	right: 34px;
+	display: none;
+}
+
+.ia-del {
+	background-image: url('../img/icon-delete.png');
+	right: 4px;
+}
+
+.ia-del:hover, .ia-edit:hover {
 	background-position: -27px 0px;
 }
 

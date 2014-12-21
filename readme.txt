@@ -3,8 +3,8 @@ Contributors: M03Gen
 Donate link: http://m03g.guriny.ru/image-annotations/
 Tags: images, note, annotations, comments
 Requires at least: 3.8.1
-Tested up to: 4.0.1
-Stable tag: 1.01
+Tested up to: 4.1
+Stable tag: 1.02
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,7 +31,7 @@ Important: for now the plugin works only with [Comment Images](https://wordpress
 
 == Screenshots ==
 
-1. Выделение необходимо фрагмента на изображении, под которым появляется форма для ввода комментария.
+1. Выделение необходимого фрагмента на изображении, под которым появляется форма для ввода комментария.
 2. Два уже добавленных комментария от одного автора. При наведении на комментарий, появляется возможность (у автора и администраторов) его удалить.
 3. При наведении на комментарий, подсвечивается выделение. И наоборот.
 4. У каждого автора свой цвет комментария и выделения.
@@ -39,6 +39,12 @@ Important: for now the plugin works only with [Comment Images](https://wordpress
 6. Иконка в правом верхнем углу изображения (видимые при наведении) позволяет скрыть/показать выделения.
 
 == Changelog ==
+
+= 1.02 =
+
+* Bug fix. 
+
+* Исправлены ошибки. Теперь плагин должен корректно работать с любой темой WordPress и при любом масштабе. Старые комментарии придётся либо удалить, либо обновить (возможность появится позже).
 
 = 1.01 =
 

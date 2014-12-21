@@ -7,7 +7,7 @@
  * Plugin Name: Image Annotations
  * Plugin URI:  http://m03g.guriny.ru/image-annotations/
  * Description: Image Annotations plugin lets readers to leave annotations to the selected area of the image in comments. Important: for now the plugin works only with Comment Images plugin (by Tom McFarlin).
- * Version:     1.01
+ * Version:     1.02
  * Author:      M03G
  * Author URI:  http://m03g.guriny.ru/
  * License:     GPL-2.0+
@@ -23,6 +23,13 @@ add_action('plugins_loaded', 'ia_init');
 
 add_filter( 'comments_array', 'ia_display_annotation');
 
+/**
+ * Функция для изменения значения, чтобы привести его в границы определённого диапазона
+ * @param int $p исходное значение
+ * @param int $p нижнее значение диапазона
+ * @param int $p верхнее значение диапазона
+ * @return int изменённое значение
+ */
 function ia_changepar($p, $f, $t) {
 	while ($p < $f) {
 		$p+= round(($t - $f) / 3);
@@ -33,6 +40,14 @@ function ia_changepar($p, $f, $t) {
 	return $p;
 }
 
+/**
+ * Функция преобразует цвет, полученный путём получения первых 6 символов от md5-хэша от ника автора комментария, в более приятный глазу, сохраняя исходный оттенок.
+ * hex-код разделяется на группы по 2 символа и переводится в десятичный формат. После этого мы переводим цвет из RGB в HSV, попутно меняя насыщенность так,
+ * чтобы она влезала в рамки от 40 до 80 и яркость так, чтобы она влезала в рамки от 60 до 100 (значения подобраны опытным путём). После, полученный цвет
+ * переводим обратно в hex-rgb
+ * @param string $tcolor hex-код цвета
+ * @return string hex-код преобразованного цвета
+ */
 function ia_getcolor($tcolor) {
 	$color = '';
 	$r = hexdec(substr($tcolor,0,2));
@@ -132,11 +147,19 @@ function ia_display_annotation($comments){
 					} else {
 						$color = $arrcolor[$unsercomm['user']['dname']];
 					}
-					if ($current_user->user_login == $unsercomm['user']['name']) {
+					// проверка существует по причине использования в первой версии плагина конкретных значений размером и позиционирования выделений. Во второй версии значения относительны.
+					// позже проверка будет убрана
+					if (array_key_exists('label', $unsercomm['annotation']) && $unsercomm['annotation']['label'] == 102) {
+						$unit = '%';
+					} else {
+						$unit = 'px';
+					}
+					if ($current_user->user_login == $unsercomm['user']['name'] || user_can($current_user->ID, 'administrator')) {
+						$edit = '<div title="' . __('Edit comment', 'image-annotations') . '" class="ia-edit" nonce="' . wp_create_nonce("nonceedit") . '"></div>';
 						$del = '<div title="' . __('Delete comment', 'image-annotations') . '" class="ia-del" nonce="' . wp_create_nonce("noncedel") . '"></div>';
 					}
-					$new_ul .= '<li ia-id="' . $annot->meta_id . '" class="ia ia-annotation" style="border-left: 2px solid #' . $color . '"><span class="ia-date" title="' . __('User time', 'image-annotations') . ': '. base64_decode($unsercomm['annotation']['usertime']) . '">'. date("d.m.Y H:i", $unsercomm['annotation']['time']) . '</span><span class="ia-author">' . $unsercomm['user']['dname'] . ':</span><span class="ia-text">' . $text_a . '</span>' . $del . '</li>';
-					$list_div .= '<div class="ia ia-area" ia-id="' . $annot->meta_id . '" style="top:' . $unsercomm['annotation']['top'] . 'px;left:' . $unsercomm['annotation']['left'] . 'px;width:' . $unsercomm['annotation']['sidew'] . 'px;height:' . $unsercomm['annotation']['sideh'] . 'px;border-color:#' . $color . '"></div>';
+					$new_ul .= '<li ia-id="' . $annot->meta_id . '" class="ia ia-annotation" style="border-left: 2px solid #' . $color . '"><span class="ia-date" title="' . __('User time', 'image-annotations') . ': '. base64_decode($unsercomm['annotation']['usertime']) . '">'. date("d.m.Y H:i", $unsercomm['annotation']['time']) . '</span><span class="ia-author">' . $unsercomm['user']['dname'] . ':</span><span class="ia-text">' . $text_a . '</span>' . $edit . $del . '</li>';
+					$list_div .= '<div class="ia ia-area" ia-id="' . $annot->meta_id . '" style="top:' . $unsercomm['annotation']['top'] . $unit . ';left:' . $unsercomm['annotation']['left'] . $unit . ';width:' . $unsercomm['annotation']['sidew'] . $unit . ';height:' . $unsercomm['annotation']['sideh'] . $unit . ';border-color:#' . $color . '"></div>';
 				}
 				$new_ul .= '</ul>';
 				$array_cont = explode('<p class="comment-image">', $comment->comment_content);
@@ -182,11 +205,12 @@ function ia_add_text(){
 	$newcomm['user']['dname'] = $current_user->display_name;
 
 	$newcomm['annotation']['text'] = base64_encode(wp_unslash($_POST['text']));
-	$newcomm['annotation']['top'] = (int)$_POST['top'];
-	$newcomm['annotation']['left'] = (int)$_POST['left'];
-	$newcomm['annotation']['sidew'] = (int)$_POST['sidew'];
-	$newcomm['annotation']['sideh'] = (int)$_POST['sideh'];
-	$newcomm['annotation']['img'] = substr($_POST['img'], 8) + 0;
+	$newcomm['annotation']['top'] = round((float)$_POST['top'], 2);
+	$newcomm['annotation']['left'] = round((float)$_POST['left'], 2);
+	$newcomm['annotation']['label'] = 102; // magic numb :)
+	$newcomm['annotation']['sidew'] = round((float)$_POST['sidew'], 2);
+	$newcomm['annotation']['sideh'] = round((float)$_POST['sideh'], 2);
+	$newcomm['annotation']['img'] = preg_replace("/[^0-9]/i","",$_POST['img']);
 	$newcomm['annotation']['time'] = time();
 	$newcomm['annotation']['usertime'] = base64_encode($_POST['usertime']);
 
@@ -207,7 +231,7 @@ function ia_delete_text(){
 	$idcommia = $_POST['delid'];
 	$annotations = $wpdb->get_row("SELECT * FROM $wpdb->commentmeta WHERE meta_id = " . $idcommia . " AND comment_id = " . $idcommimg . " AND meta_key = 'annotation_to_image' LIMIT 1");
 	$unsercomm = unserialize(unserialize($annotations->meta_value));
-	if ($current_user->user_login == $unsercomm['user']['name']) {
+	if ($current_user->user_login == $unsercomm['user']['name'] || user_can($current_user->ID, 'administrator')) {
 		$wpdb->delete('wp_commentmeta', array('meta_id' => $idcommia), array('%d'));
 		if (!$wpdb->get_var("SELECT * FROM $wpdb->commentmeta WHERE meta_id = " . $idcommia . " AND comment_id = " . $idcommimg . " AND meta_key = 'annotation_to_image' LIMIT 1")) {
 			echo 'delok';
@@ -218,17 +242,13 @@ function ia_delete_text(){
 
 function ia_add_form($content){
 	if (is_single() || is_page()) {
-
 		$form = '<div class="anotText">';
-
 		if (!is_user_logged_in()) {
 			$form.= '<p class="must-log-in">' . sprintf( __( 'You must be <a href="%s">logged in</a> to post a comment.' ), wp_login_url( apply_filters( 'the_permalink', get_permalink( $post_id ) ) ) ) . '</p>';
 		} else {
 			$form.= '<textarea id="ia-textarea" placeholder="' . __('Comment', 'image-annotations') . '"></textarea><button class="ia-cancel" type="cancel">cancel</button><button nonce=' . wp_create_nonce("nonceok") . ' class="ia-ok">ok</button>';
 		}
-
 		$form.= '</div>';
-
 		$content.= $form;
 	}
 	return $content;
