@@ -10,6 +10,10 @@
 	line-height: 0;
 }
 
+p.comment-image img {
+	width: auto;
+}
+
 .anotBox {
 	width: 30px;
 	height: 30px;
@@ -101,6 +105,13 @@
 	color: #444;
 }
 
+.ia-annotations ul li span.ia-edited {
+	font-size: 0.75em;
+	font-weight: 500;
+	margin-left: 3px;
+	color: #444;
+}
+
 .ia-annotations ul li span.ia-author {
 	font-size: 0.75em;
 	margin-left: 7px;
@@ -111,6 +122,8 @@
 	display: block;
 	font-size: 0.9em;
 	line-height: 1.6em;
+	max-height: 200px;
+	overflow: auto;
 }
 
 .ia-area {
@@ -169,7 +182,7 @@
 .ia-edit {
 	background-image: url('../img/icon-edit.png');
 	right: 34px;
-	display: none;
+	/*display: none;*/
 }
 
 .ia-del {
@@ -179,6 +192,17 @@
 
 .ia-del:hover, .ia-edit:hover {
 	background-position: -27px 0px;
+}
+
+.ia-di-none {
+	display: none;
+}
+
+.ia-endedit {
+	display: none;
+	font-size: 0.85em;
+	font-weight: 500;
+	color: #444;
 }
 
 button {
@@ -194,6 +218,14 @@ button.ia-ok {
 	font-weight: bold;
 	color: #fff;
 	border: 1px solid #aaa;
+	float: left;
+}
+
+button.ia-disabled {
+	background: transparent;
+	border: 1px solid #ccc;
+	color: rgba(102, 102, 102, 0.50);
+	font-weight: normal;
 	float: left;
 }
 
