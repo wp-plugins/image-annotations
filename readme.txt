@@ -4,7 +4,7 @@ Donate link: http://m03g.guriny.ru/image-annotations/
 Tags: images, note, annotations, comments
 Requires at least: 3.8.1
 Tested up to: 4.1
-Stable tag: 1.02
+Stable tag: 1.03
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,11 +40,23 @@ Important: for now the plugin works only with [Comment Images](https://wordpress
 
 == Changelog ==
 
+= 1.03 =
+
+* Added the ability to edit comments (15 minutes after publication)
+* Added page with a list of comments in the admin panel
+* Bug fix
+* Visual and logical improvement
+
+* Добавлена возможность редактирования комментария (в течение 15 минут с момента публикации)
+* Добавлена страница с полным списком комментариев в Панели администратора
+* Исправлены ошибки (в том числе ошибка с некорректным сохранением положения и размеров выделения)
+* Произведеные различные улучшения визуального и логического характера
+
 = 1.02 =
 
-* Bug fix. 
+* Bug fix
 
-* Исправлены ошибки. Теперь плагин должен корректно работать с любой темой WordPress и при любом масштабе. Старые комментарии придётся либо удалить, либо обновить (возможность появится позже).
+* Исправлены ошибки. Теперь плагин должен корректно работать с любой темой WordPress и при любом масштабе. Старые комментарии придётся либо удалить, либо обновить (возможность появится позже)
 
 = 1.01 =
 
