@@ -7,7 +7,7 @@
  * Plugin Name: Image Annotations
  * Plugin URI:  http://m03g.guriny.ru/image-annotations/
  * Description: Image Annotations plugin lets readers to leave annotations to the selected area of the image in comments. Important: for now the plugin works only with Comment Images plugin (by Tom McFarlin).
- * Version:     1.03
+ * Version:     1.0.4
  * Author:      M03G
  * Author URI:  http://m03g.guriny.ru/
  * License:     GPL-2.0+
@@ -217,7 +217,10 @@ function ia_display_annotation($comments){
 					if ($current_user->user_login == $unsercomm['user']['name'] && $unsercomm['annotation']['time'] + 900 >  time()) {
 						$edit = '<span class="ia-endedit" data-countdown="' . date("m/d/Y H:i:s", (strtotime(base64_decode($unsercomm['annotation']['usertime'])) + 900)) . '" title="' . __('Time to end editing capabilities', 'image-annotations') . '"></span><div title="' . __('Edit comment (edit 15 minutes from the time of publication)', 'image-annotations') . '" class="ia-edit" nonce="' . wp_create_nonce("nonceedit") . '"></div>';
 					}
-					$new_ul .= '<li id="annotation-' . $annot->meta_id . '" ia-id="' . $annot->meta_id . '" class="ia ia-annotation" style="border-left: 2px solid #' . $color . '"><span class="ia-date" title="' . __('User time', 'image-annotations') . ': '. base64_decode($unsercomm['annotation']['usertime']) . '">'. date("d.m.Y H:i", $unsercomm['annotation']['time']) . '</span>' . $edited . '<span class="ia-author">' . $unsercomm['user']['dname'] . ':</span><span class="ia-text">' . $text_a . '</span>' . $edit . $del . '</li>';
+					$new_ul .= 	'<li id="annotation-' . $annot->meta_id . '" ia-id="' . $annot->meta_id . '" class="ia ia-annotation" style="border-left: 2px solid #' . $color . 
+								'"><span class="ia-date" title="' . __('User time', 'image-annotations') . ': '. base64_decode($unsercomm['annotation']['usertime']) . 
+								'">'. date("d.m.Y H:i", $unsercomm['annotation']['time']) . '</span>' . $edited . '<span class="ia-author" style="color: #' . $color . ';">' . $unsercomm['user']['dname'] . 
+								':</span><span class="ia-text">' . $text_a . '</span>' . $edit . $del . '<div class="ia-reply"></div></li>';
 					$list_div .= '<div class="ia ia-area" ia-id="' . $annot->meta_id . '" style="top:' . round($unsercomm['annotation']['top'], 2) . $unit . ';left:' . round($unsercomm['annotation']['left'], 2) . $unit . ';width:' . round($unsercomm['annotation']['sidew'], 2) . $unit . ';height:' . round($unsercomm['annotation']['sideh'], 2) . $unit . ';border-color:#' . $color . '"></div>';
 				}
 				$new_ul .= '</ul>';
