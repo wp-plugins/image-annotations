@@ -3,8 +3,8 @@ Contributors: M03Gen
 Donate link: http://m03g.guriny.ru/image-annotations/
 Tags: images, note, annotations, comments
 Requires at least: 3.8.1
-Tested up to: 4.3
-Stable tag: 1.0.4
+Tested up to: 4.3.1
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,7 +40,17 @@ Important: for now the plugin works only with [Comment Images](https://wordpress
 
 == Changelog ==
 
-= 1.0.4 =
+= 1.1 =
+
+* Many style changes.
+* Major bug fixes.
+
+* Добавлена возможность отвечать на оставленные аннотации
+* При клике на выделение проиходит переход к аннотации
+* Изменены стили
+* Исправлены ошибки
+
+= 1.04 =
 
 * Added ability to view comments when hovering the selection area.
 * Icons are now a font.
@@ -52,7 +62,7 @@ Important: for now the plugin works only with [Comment Images](https://wordpress
 * Изменены стили
 * Исправлены ошибки
 
-= 1.0.3 =
+= 1.03 =
 
 * Added the ability to edit comments (15 minutes after publication)
 * Added page with a list of comments in the admin panel
@@ -64,13 +74,13 @@ Important: for now the plugin works only with [Comment Images](https://wordpress
 * Исправлены ошибки (в том числе ошибка с некорректным сохранением положения и размеров выделения)
 * Произведеные различные улучшения визуального и логического характера
 
-= 1.0.2 =
+= 1.02 =
 
 * Bug fixes
 
 * Исправлены ошибки. Теперь плагин должен корректно работать с любой темой WordPress и при любом масштабе. Старые комментарии придётся либо удалить, либо обновить (возможность появится позже)
 
-= 1.0.1 =
+= 1.01 =
 
 * Bug fix. Past comments will have to delete :( 
 * Added Russian and English
@@ -82,6 +92,6 @@ Important: for now the plugin works only with [Comment Images](https://wordpress
 * Добавлены цвета рамок выделений и комментариев - у каждого пользователя свой цвет, основанный на его нике
 * Добавлена плавная анимация для некоторых действий
 
-= 1.0.0 =
+= 1.00 =
 
 * First version

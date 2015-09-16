@@ -7,7 +7,7 @@
  * Plugin Name: Image Annotations
  * Plugin URI:  http://m03g.guriny.ru/image-annotations/
  * Description: Image Annotations plugin lets readers to leave annotations to the selected area of the image in comments. Important: for now the plugin works only with Comment Images plugin (by Tom McFarlin).
- * Version:     1.0.4
+ * Version:     1.1
  * Author:      M03G
  * Author URI:  http://m03g.guriny.ru/
  * License:     GPL-2.0+
@@ -179,20 +179,90 @@ function ia_getcolor($tcolor) {
 
 function ia_init() {
 	load_plugin_textdomain('image-annotations', false, dirname(plugin_basename(__FILE__)) . '/lang/');
-} 
+}
+
+function generateList($reply_key, $reply, $arrcolor) {
+	global $current_user;
+	$del_rep = $edit_rep = $edited_rep = $result = '';
+	if (!array_key_exists($reply['user']['dname'], $arrcolor)) {
+		$color_r = ia_getcolor(substr(md5($reply['user']['dname']), 0, 6));
+		$arrcolor[$reply['user']['dname']] = $color_r;
+	} else {
+		$color_r = $arrcolor[$reply['user']['dname']];
+	}
+	if (array_key_exists('edit', $reply['annotation'])) {
+		$edited_rep = '<span class="ia-edited" title="edited ' . date("H:i", $reply['annotation']['edit']) . '">*</span>';
+	}
+	if ($current_user->user_login == $reply['user']['name'] && $reply['annotation']['time'] + 900 >  time()) {
+		$edit_rep = '<span class="ia-endedit" data-countdown="' . date("m/d/Y H:i:s", (strtotime(base64_decode($reply['annotation']['usertime'])) + 900)) . '" title="' . __('Time to end editing capabilities', 'image-annotations') . '"></span><div title="' . __('Edit comment (edit 15 minutes from the time of publication)', 'image-annotations') . '" class="ia-edit" nonce="' . wp_create_nonce("nonceedit") . '"></div>';
+	}
+	if ($current_user->user_login == $reply['user']['name'] || user_can($current_user->ID, 'administrator')) {						
+		$del_rep = '<div title="' . __('Delete comment', 'image-annotations') . '" class="ia-del" nonce="' . wp_create_nonce("noncedel") . '"></div>';
+	}
+	$result .= '<li id="annotation-' . $reply_key . '" ia-id="' . $reply['annotation']['reply'] . '" ia-reply-to="' . $reply['annotation']['replyto'] . '" class="ia ia-annotation" style="border-left: 2px solid #' . $color_r . 
+		'"><span class="ia-date" title="' . __('User time', 'image-annotations') . ': '. base64_decode($reply['annotation']['usertime']) . 
+		'">'. date("d.m.Y H:i", $reply['annotation']['time']) . '</span>' . $edited_rep . '<span class="ia-author" style="color: #' . $color_r . ';">' . $reply['user']['dname'] . 
+		':</span><span class="ia-text">' . base64_decode($reply['annotation']['text']) . '</span>' . $edit_rep . $del_rep . '<div class="ia-reply"></div>';
+	return $result;
+}
+
+function recurMass($item, $replys, $arrcolor) {
+	global $replymass;
+	if (count($item) > 0) {
+		$replymass .= '<ul>';
+		foreach ($item as $key => $value) {
+			$replymass .= generateList($key, $replys[$key], $arrcolor);
+			recurMass($item[$key], $replys, $arrcolor);
+			$replymass .= '</li>';
+		}
+		$replymass .= '</ul>';
+	}
+}
 
 function ia_display_annotation($comments){
 	$arrcolor = array();
 	if (count($comments) > 0) {
-		global $current_user;
+		global $current_user, $replymass;
 		foreach($comments as $comment){
 			$new_ul = $list_div = '';
 			if (true == get_comment_meta($comment->comment_ID, 'annotation_to_image')) {
 				global $wpdb;
-				$annotations = $wpdb->get_results("SELECT * FROM $wpdb->commentmeta WHERE comment_id = " . $comment->comment_ID . " AND meta_key = 'annotation_to_image' ORDER by meta_id");
+				$all_annotations = $wpdb->get_results("SELECT * FROM $wpdb->commentmeta WHERE comment_id = " . $comment->comment_ID . " AND meta_key = 'annotation_to_image' ORDER by meta_id");
+				$annotations = array();
+				$replys = array();
+				$all_an = array();
+				foreach ($all_annotations as $one_annot) {
+					$annot_comm = unserialize(unserialize($one_annot->meta_value));
+					if (array_key_exists('reply', $annot_comm['annotation'])) {
+						$replys[$one_annot->meta_id] = $annot_comm;
+					} else {
+						$annotations[$one_annot->meta_id] = $annot_comm;
+					}
+					$all_an[] = array(
+						'id' => $one_annot->meta_id,
+						'ann' => $annot_comm,
+					);
+				}
+
+				$tree = array(); 
+				$sub = array( 0 => &$tree ); 
+
+				foreach ($all_an as $item) 
+				{
+				    $id = $item['id'];
+				    if (array_key_exists('replyto', $item['ann']['annotation'])) {
+				    	$parent = $item['ann']['annotation']['replyto'];
+				    } else {
+				    	$parent = 0;
+				    }
+
+				    $branch = &$sub[$parent]; 
+				    $branch[$id] = array(); 
+				    $sub[$id] = &$branch[$id]; 
+				}
+
 				$new_ul .= '<ul class="ia-list">';
-				foreach ($annotations as $annot) {
-					$unsercomm = unserialize(unserialize($annot->meta_value));
+				foreach ($annotations as $key => $unsercomm) {
 					$del = $edit = $edited = '';
 					$text_a = base64_decode($unsercomm['annotation']['text']);
 					if (!array_key_exists($unsercomm['user']['dname'], $arrcolor)) {
@@ -217,15 +287,21 @@ function ia_display_annotation($comments){
 					if ($current_user->user_login == $unsercomm['user']['name'] && $unsercomm['annotation']['time'] + 900 >  time()) {
 						$edit = '<span class="ia-endedit" data-countdown="' . date("m/d/Y H:i:s", (strtotime(base64_decode($unsercomm['annotation']['usertime'])) + 900)) . '" title="' . __('Time to end editing capabilities', 'image-annotations') . '"></span><div title="' . __('Edit comment (edit 15 minutes from the time of publication)', 'image-annotations') . '" class="ia-edit" nonce="' . wp_create_nonce("nonceedit") . '"></div>';
 					}
-					$new_ul .= 	'<li id="annotation-' . $annot->meta_id . '" ia-id="' . $annot->meta_id . '" class="ia ia-annotation" style="border-left: 2px solid #' . $color . 
+					$new_ul .= 	'<li id="annotation-' . $key . '" ia-id="' . $key . '" class="ia ia-annotation" style="border-left: 2px solid #' . $color . 
 								'"><span class="ia-date" title="' . __('User time', 'image-annotations') . ': '. base64_decode($unsercomm['annotation']['usertime']) . 
 								'">'. date("d.m.Y H:i", $unsercomm['annotation']['time']) . '</span>' . $edited . '<span class="ia-author" style="color: #' . $color . ';">' . $unsercomm['user']['dname'] . 
-								':</span><span class="ia-text">' . $text_a . '</span>' . $edit . $del . '<div class="ia-reply"></div></li>';
-					$list_div .= '<div class="ia ia-area" ia-id="' . $annot->meta_id . '" style="top:' . round($unsercomm['annotation']['top'], 2) . $unit . ';left:' . round($unsercomm['annotation']['left'], 2) . $unit . ';width:' . round($unsercomm['annotation']['sidew'], 2) . $unit . ';height:' . round($unsercomm['annotation']['sideh'], 2) . $unit . ';border-color:#' . $color . '"></div>';
+								':</span><span class="ia-text">' . $text_a . '</span>' . $edit . $del . '<div class="ia-reply"></div>';
+					if (isset($tree[$key]) && count($tree[$key]) > 0) {
+						$replymass = '';
+						recurMass($tree[$key], $replys, $arrcolor);
+						$new_ul .= $replymass;
+					}
+					$new_ul .= '</li>';
+					$list_div .= '<div class="ia ia-area" ia-id="' . $key . '" style="top:' . round($unsercomm['annotation']['top'], 2) . $unit . ';left:' . round($unsercomm['annotation']['left'], 2) . $unit . ';width:' . round($unsercomm['annotation']['sidew'], 2) . $unit . ';height:' . round($unsercomm['annotation']['sideh'], 2) . $unit . ';border-color:#' . $color . '"><a href="#annotation-' . $key . '"></a></div>';
 				}
 				$new_ul .= '</ul>';
 				$array_cont = explode('<p class="comment-image">', $comment->comment_content);
-				$comment->comment_content = $array_cont[0] . '<div class="ia-main"><p class="comment-image">' . $array_cont[1] . '<div class="ia-area-vis-switch hide" vis="on"></div>' . $list_div . '<div class="ia-annotations-vis-switch hide" vis="on" title="' . __('Show/hide comments', 'image-annotations') . '"></div></div>';
+				$comment->comment_content = $array_cont[0] . '<div class="ia-main"><p class="comment-image">' . $array_cont[1] . '<div class="ia-area-vis-switch hide" vis="on" title="' . __('Show/hide selection areas', 'image-annotations') . '"></div>' . $list_div . '<div class="ia-annotations-vis-switch hide" vis="on" title="' . __('Show/hide comments', 'image-annotations') . '"></div></div>';
 				$comment->comment_content .= '<div class="ia-annotations">';
 				$comment->comment_content .= $new_ul;
 				$comment->comment_content .= '</div>';
@@ -234,6 +310,8 @@ function ia_display_annotation($comments){
 	}
 	return $comments;
 }
+
+
 
 function ia_add_scripts() {
 	if (is_single() || is_page()) {
@@ -268,12 +346,17 @@ function ia_add_text(){
 	$newcomm['user']['name'] = $current_user->user_login;
 	$newcomm['user']['dname'] = $current_user->display_name;
 
+	if (isset($_POST['reply']) && !empty($_POST['reply'])) {
+		$newcomm['annotation']['reply'] = (int)$_POST['reply'];
+		$newcomm['annotation']['replyto'] = (int)$_POST['replyto'];
+	} else {
+		$newcomm['annotation']['top'] = (float)$_POST['top'];
+		$newcomm['annotation']['left'] = (float)$_POST['left'];
+		$newcomm['annotation']['sidew'] = (float)$_POST['sidew'];
+		$newcomm['annotation']['sideh'] = (float)$_POST['sideh'];
+	}
 	$newcomm['annotation']['text'] = base64_encode(wp_unslash($_POST['text']));
-	$newcomm['annotation']['top'] = (float)$_POST['top'];
-	$newcomm['annotation']['left'] = (float)$_POST['left'];
 	$newcomm['annotation']['label'] = 102; // magic numb :)
-	$newcomm['annotation']['sidew'] = (float)$_POST['sidew'];
-	$newcomm['annotation']['sideh'] = (float)$_POST['sideh'];
 	$newcomm['annotation']['img'] = preg_replace("/[^0-9]/i","",$_POST['img']);
 	$newcomm['annotation']['time'] = time();
 	$newcomm['annotation']['usertime'] = base64_encode($_POST['usertime']);
@@ -305,6 +388,8 @@ function ia_edit_text(){
 		} else {
 			echo 'editno';
 		}
+	} else {
+		echo 'editno';
 	}
 	exit;
 }
