@@ -7,7 +7,7 @@
  * Plugin Name: Image Annotations
  * Plugin URI:  http://m03g.guriny.ru/image-annotations/
  * Description: Image Annotations plugin lets readers to leave annotations to the selected area of the image in comments. Important: for now the plugin works only with Comment Images plugin (by Tom McFarlin).
- * Version:     1.1
+ * Version:     1.10
  * Author:      M03G
  * Author URI:  http://m03g.guriny.ru/
  * License:     GPL-2.0+
